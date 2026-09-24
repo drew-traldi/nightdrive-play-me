@@ -1,0 +1,93 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NIGHTDRIVE — Synth Piano</title>
+<meta name="description" content="A playable synthwave piano with oscilloscope, chorus and echo. Record your jam and download it.">
+<meta property="og:title" content="Nightdrive">
+<meta property="og:description" content="A playable synthwave piano with oscilloscope, chorus and echo. Record your jam and download it.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://drew-traldi.github.io/nightdrive-play-me/">
+<meta name="twitter:card" content="summary">
+<meta name="author" content="Drew Traldi">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20100%20100%27%3E%3Ctext%20y%3D%27.9em%27%20font-size%3D%2790%27%3E%F0%9F%8C%86%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Monoton&family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;font-family:'Exo 2',sans-serif;color:#fff;background:linear-gradient(180deg,#0d0221 0%,#261447 45%,#541388 70%,#ff2a6d 100%);display:flex;flex-direction:column;align-items:center;padding:24px 10px;overflow-x:hidden}
+.sun{position:fixed;left:50%;top:18vh;width:300px;height:300px;transform:translateX(-50%);border-radius:50%;background:linear-gradient(#ffd319,#ff2975 70%);-webkit-mask:linear-gradient(#000 50%,transparent 50%),repeating-linear-gradient(#000 0 10px,transparent 10px 14px);-webkit-mask-composite:source-over;mask:linear-gradient(#000 50%,transparent 50%),repeating-linear-gradient(#000 0 10px,transparent 10px 14px);mask-composite:add;opacity:.7;z-index:0;filter:drop-shadow(0 0 40px #ff2975)}
+.mtn{position:fixed;left:0;right:0;top:calc(18vh + 150px);height:60px;background:#1a0b33;clip-path:polygon(0 100%,8% 30%,16% 70%,26% 10%,36% 60%,46% 20%,55% 80%,64% 25%,74% 65%,84% 15%,92% 55%,100% 30%,100% 100%);z-index:0}
+h1{font-family:'Monoton',cursive;font-weight:400;font-size:clamp(34px,8vw,76px);color:#ff71ce;text-shadow:0 0 10px #ff71ce,0 0 30px #b967ff;position:relative;z-index:1;letter-spacing:4px}
+.synth{position:relative;z-index:1;margin-top:22vh;width:min(1000px,100%);background:linear-gradient(180deg,#1b1b2f,#0f0f1d);border:2px solid #b967ff;border-radius:18px;padding:18px;box-shadow:0 0 40px rgba(185,103,255,.5),0 30px 60px rgba(0,0,0,.6)}
+.panel{display:flex;gap:18px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:16px}
+.grp{display:flex;flex-direction:column;gap:6px;font-size:11px;letter-spacing:2px;color:#01cdfe;text-transform:uppercase}
+.grp .opts{display:flex;gap:4px}
+.grp button{background:#000;color:#05ffa1;border:1px solid #333;border-radius:4px;padding:6px 8px;font:700 11px 'Exo 2';cursor:pointer;text-transform:uppercase}
+.grp button.on{border-color:#05ffa1;box-shadow:0 0 8px #05ffa1}
+.grp input{accent-color:#ff71ce;width:110px}
+canvas{width:180px;height:50px;background:#000;border:1px solid #333;border-radius:6px}
+.keys{position:relative;display:flex;height:220px;user-select:none;touch-action:none}
+.w{flex:1;background:linear-gradient(180deg,#f4f0ff,#d9d0f5);border:1px solid #1b1b2f;border-radius:0 0 8px 8px;position:relative;cursor:pointer;display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;font-size:11px;color:#8a7bb0;font-weight:700}
+.w.on{background:linear-gradient(180deg,#ff71ce,#b967ff);color:#fff;box-shadow:0 0 30px #ff71ce}
+.b{position:absolute;top:0;height:62%;background:linear-gradient(180deg,#2a2a40,#000);border-radius:0 0 6px 6px;z-index:2;cursor:pointer;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;font-size:10px;color:#666;border:1px solid #000}
+.b.on{background:linear-gradient(180deg,#01cdfe,#05ffa1);box-shadow:0 0 20px #01cdfe;color:#000}
+.hint{margin-top:12px;font-size:12px;color:#b8a6e0;text-align:center}
+.grp button.rec{color:#ff2a6d;border-color:#ff2a6d}.grp button.rec.on{background:#ff2a6d;color:#fff;box-shadow:0 0 14px #ff2a6d;animation:rp 1s infinite}@keyframes rp{50%{box-shadow:0 0 2px #ff2a6d}}
+.grp select{background:#000;color:#05ffa1;border:1px solid #333;border-radius:4px;padding:5px;font:700 11px 'Exo 2'}
+.rt{font:700 11px 'Exo 2';color:#ff71ce;letter-spacing:1px;min-height:14px}
+.note{font-family:'Monoton';font-size:26px;color:#05ffa1;text-shadow:0 0 12px #05ffa1;min-width:90px;text-align:center}
+</style></head><body><div class="sun"></div><div class="mtn"></div>
+<h1>NIGHTDRIVE</h1>
+<div class="synth">
+<div class="panel">
+ <div class="grp">Wave<div class="opts" id="wave"><button data-w="sawtooth" class="on">Saw</button><button data-w="square">Sqr</button><button data-w="triangle">Tri</button><button data-w="sine">Sin</button></div></div>
+ <div class="grp">Octave<div class="opts"><button id="od">−</button><button id="ov" style="color:#fff">4</button><button id="ou">+</button></div></div>
+ <div class="grp">Cutoff<input type="range" id="cut" min="200" max="8000" value="2400"></div>
+ <div class="grp">Release<input type="range" id="rel" min=".05" max="2" step=".05" value=".5"></div>
+ <div class="grp">Chorus / Echo<div class="opts"><button id="ch" class="on">Chorus</button><button id="dl" class="on">Echo</button></div></div>
+ <div class="grp">Record<div class="opts"><button class="rec" id="rec">● Rec</button><select id="rfmt" title="File format"><option value="wav">WAV</option><option value="mr">Small</option></select></div><div class="rt" id="rt"></div></div>
+ <div class="note" id="note">—</div>
+ <canvas id="scope" width="360" height="100"></canvas>
+</div>
+<div class="keys" id="keys"></div>
+<div class="hint">Play with your mouse, touch, or keyboard: A W S E D F T G Y H U J K O L P ; — Z / X shift octave · ● Rec to record and download your playing</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);let ac,master,filt,an,delay,oct=4,wave='sawtooth',chorus=true,echo=true;const voices={};
+const NN=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];const KEYS='awsedftgyhujkolp;';
+function init(){if(ac)return;ac=new AudioContext();master=ac.createGain();master.gain.value=.35;filt=ac.createBiquadFilter();filt.type='lowpass';filt.Q.value=6;filt.frequency.value=+$('cut').value;
+ delay=ac.createDelay();delay.delayTime.value=.33;const fb=ac.createGain();fb.gain.value=.35;const wet=ac.createGain();wet.gain.value=.3;delay.connect(fb).connect(delay);delay.connect(wet).connect(master);
+ an=ac.createAnalyser();an.fftSize=1024;filt.connect(master);filt.connect(delay);master.connect(an).connect(ac.destination);delay.wetG=wet;scope()}
+function freq(m){return 440*Math.pow(2,(m-69)/12)}
+function on(m){init();ac.resume();if(voices[m])return;const t=ac.currentTime,g=ac.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.5,t+.01);g.gain.linearRampToValueAtTime(.35,t+.2);g.connect(filt);
+ const os=[0,...(chorus?[-9,9]:[])].map(d=>{const o=ac.createOscillator();o.type=wave;o.frequency.value=freq(m);o.detune.value=d;const og=ac.createGain();og.gain.value=chorus?.4:1;o.connect(og).connect(g);o.start(t);return o});
+ voices[m]={g,os};const el=document.querySelector(`[data-m="${m}"]`);if(el)el.classList.add('on');$('note').textContent=NN[m%12]+(Math.floor(m/12)-1)}
+function off(m){const v=voices[m];if(!v)return;const t=ac.currentTime,r=+$('rel').value;v.g.gain.cancelScheduledValues(t);v.g.gain.setValueAtTime(v.g.gain.value,t);v.g.gain.exponentialRampToValueAtTime(.0001,t+r);v.os.forEach(o=>o.stop(t+r+.05));delete voices[m];const el=document.querySelector(`[data-m="${m}"]`);if(el)el.classList.remove('on')}
+function build(){const start=12*(oct+1),n=24,whites=[];let html='';for(let i=0;i<=n;i++){const m=start+i;if(!NN[m%12].includes('#'))whites.push(m)}
+ const ww=100/whites.length;html=whites.map((m,i)=>`<div class="w" data-m="${m}">${m%12===0?'C'+(Math.floor(m/12)-1):''}<span style="position:absolute;top:8px;opacity:.5">${kl(m)}</span></div>`).join('');
+ whites.forEach((m,i)=>{if(NN[(m+1)%12].includes('#')&&i<whites.length-1)html+=`<div class="b" data-m="${m+1}" style="left:${(i+1)*ww-ww*.3}%;width:${ww*.6}%">${kl(m+1)}</div>`});$('keys').innerHTML=html;$('ov').textContent=oct}
+function kl(m){const i=m-12*(oct+1);return i>=0&&i<KEYS.length?KEYS[i].toUpperCase():''}
+let mouse=false,cur=null;$('keys').onpointerdown=e=>{mouse=true;const k=e.target.closest('[data-m]');if(k){cur=+k.dataset.m;on(cur)}};
+$('keys').onpointermove=e=>{if(!mouse)return;const el=document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-m]');const m=el?+el.dataset.m:null;if(m!==cur){if(cur!=null)off(cur);cur=m;if(m!=null)on(m)}};
+addEventListener('pointerup',()=>{mouse=false;if(cur!=null)off(cur);cur=null});
+const held={};addEventListener('keydown',e=>{if(e.repeat||e.metaKey||e.ctrlKey)return;const k=e.key.toLowerCase();if(k==='z'){oct=Math.max(1,oct-1);build()}if(k==='x'){oct=Math.min(7,oct+1);build()}const i=KEYS.indexOf(k);if(i>=0){const m=12*(oct+1)+i;held[k]=m;on(m)}});
+addEventListener('keyup',e=>{const k=e.key.toLowerCase();if(held[k]!=null){off(held[k]);delete held[k]}});
+$('wave').querySelectorAll('button').forEach(b=>b.onclick=()=>{wave=b.dataset.w;$('wave').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))});
+$('od').onclick=()=>{oct=Math.max(1,oct-1);build()};$('ou').onclick=()=>{oct=Math.min(7,oct+1);build()};
+$('cut').oninput=()=>{if(filt)filt.frequency.value=+$('cut').value};$('ch').onclick=()=>{chorus=!chorus;$('ch').classList.toggle('on',chorus)};
+$('dl').onclick=()=>{echo=!echo;$('dl').classList.toggle('on',echo);if(delay)delay.wetG.gain.value=echo?.3:0};
+function scope(){const c=$('scope'),x=c.getContext('2d'),d=new Uint8Array(an.fftSize);(function f(){an.getByteTimeDomainData(d);x.fillStyle='rgba(0,0,0,.35)';x.fillRect(0,0,c.width,c.height);x.strokeStyle='#05ffa1';x.shadowColor='#05ffa1';x.shadowBlur=8;x.lineWidth=2;x.beginPath();for(let i=0;i<d.length;i++){const X=i/d.length*c.width,Y=d[i]/255*c.height;i?x.lineTo(X,Y):x.moveTo(X,Y)}x.stroke();requestAnimationFrame(f)})()}
+function makeRecorder(ac,src){let mode,mr,chunks,sp,dest,L,R,zero;
+ return{start(fmt){if(!window.MediaRecorder)fmt='wav';if(fmt==='wav'){L=[];R=[];sp=ac.createScriptProcessor(4096,2,2);zero=ac.createGain();zero.gain.value=0;sp.onaudioprocess=e=>{L.push(new Float32Array(e.inputBuffer.getChannelData(0)));R.push(new Float32Array(e.inputBuffer.getChannelData(1)))};src.connect(sp);sp.connect(zero).connect(ac.destination);mode='wav'}
+  else{dest=ac.createMediaStreamDestination();src.connect(dest);const t=['audio/webm;codecs=opus','audio/mp4','audio/webm','audio/ogg'].find(x=>window.MediaRecorder&&MediaRecorder.isTypeSupported(x));mr=new MediaRecorder(dest.stream,t?{mimeType:t}:{});chunks=[];mr.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};mr.start(1000);mode='mr'}},
+ stop(){return new Promise(res=>{if(mode==='wav'){src.disconnect(sp);sp.disconnect();zero.disconnect();res({blob:toWav(L,R,ac.sampleRate),ext:'wav'})}
+  else{mr.onstop=()=>{src.disconnect(dest);const type=mr.mimeType||'audio/webm';res({blob:new Blob(chunks,{type}),ext:/mp4/.test(type)?'m4a':/ogg/.test(type)?'ogg':'webm'})};mr.stop()}})}}}
+function toWav(L,R,sr){const n=L.reduce((a,b)=>a+b.length,0),buf=new ArrayBuffer(44+n*4),v=new DataView(buf),w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};
+ w(0,'RIFF');v.setUint32(4,36+n*4,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,2,true);v.setUint32(24,sr,true);v.setUint32(28,sr*4,true);v.setUint16(32,4,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*4,true);
+ let o=44;for(let k=0;k<L.length;k++){const a=L[k],b=R[k];for(let i=0;i<a.length;i++){let s=Math.max(-1,Math.min(1,a[i]));v.setInt16(o,s<0?s*32768:s*32767,true);s=Math.max(-1,Math.min(1,b[i]));v.setInt16(o+2,s<0?s*32768:s*32767,true);o+=4}}return new Blob([buf],{type:'audio/wav'})}
+function saveBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
+
+let recr=null,rt0=0,rtick,take=+(localStorage.ndTake||0);
+$('rec').onclick=async()=>{init();ac.resume();if(recr){clearInterval(rtick);const r=recr;recr=null;$('rec').classList.remove('on');$('rec').textContent='● Rec';$('rt').textContent='saving…';
+  const {blob,ext}=await r.stop();take++;try{localStorage.ndTake=take}catch(e){}saveBlob(blob,`nightdrive-take-${take}.${ext}`);$('rt').textContent=`saved take ${take} ✓`;return}
+ recr=makeRecorder(ac,master);recr.start($('rfmt').value);rt0=Date.now();$('rec').classList.add('on');$('rec').textContent='■ Save';
+ rtick=setInterval(()=>{const e=(Date.now()-rt0)/1000;$('rt').textContent=`● ${Math.floor(e/60)}:${String(Math.floor(e%60)).padStart(2,'0')}`;if($('rfmt').value==='wav'&&e>=600)$('rec').click()},250)};
+build();
+</script></body></html>
